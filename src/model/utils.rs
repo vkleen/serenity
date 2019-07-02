@@ -135,6 +135,32 @@ pub fn serialize_private_channels<S: Serializer>(
     seq.end()
 }
 
+pub fn deserialize_user_guild_settings<'de, D: Deserializer<'de>>(
+    deserializer: D)
+    -> StdResult<HashMap<Option<GuildId>, UserGuildSettings>, D::Error> {
+    let vec: Vec<UserGuildSettings> = Deserialize::deserialize(deserializer)?;
+    let mut guild_settings_map: HashMap<Option<GuildId>, UserGuildSettings> = HashMap::new();
+
+    for guild_settings in vec {
+        guild_settings_map.insert(guild_settings.guild_id, guild_settings);
+    }
+
+    Ok(guild_settings_map)
+}
+
+pub fn deserialize_user_channel_overrides<'de, D: Deserializer<'de>>(
+    deserializer: D)
+    -> StdResult<HashMap<ChannelId, UserChannelOverrides>, D::Error> {
+    let vec: Vec<UserChannelOverrides> = Deserialize::deserialize(deserializer)?;
+    let mut channel_overrides_map = HashMap::new();
+
+    for channel_overrides in vec {
+        channel_overrides_map.insert(channel_overrides.channel_id, channel_overrides);
+    }
+
+    Ok(channel_overrides_map)
+}
+
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<RoleId, Role>, D::Error> {

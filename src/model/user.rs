@@ -916,9 +916,33 @@ impl<'a> From<&'a User> for UserId {
 /// Only available for user accounts
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 pub struct UserSettings {
-    // Nany fields omitted
-    // #[serde(deserialize_with = "deserialize_guild_id")]
-    pub guild_positions: Vec<GuildId>
+    /// The guilds the user has respositioned in the client, in order
+    /// Guilds that have not been moved do not seem to be present
+    pub guild_positions: Vec<GuildId>,
+    // Fields omitted
+}
+
+// TODO: Make this work better with private channels,
+// private channels will have no guild_id, but will have channel ids
+// in the channel_overrides map
+/// Client settings for a guild or private message
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+pub struct UserGuildSettings {
+    #[serde(default, deserialize_with = "deserialize_user_channel_overrides")]
+    pub channel_overrides: HashMap<ChannelId, UserChannelOverrides>,
+    pub guild_id: Option<GuildId>,
+    pub message_notifications: usize,
+    pub mobile_push: bool,
+    pub muted: bool,
+    pub suppress_everyone: bool,
+}
+
+/// Client overrides for a channel
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+pub struct UserChannelOverrides {
+    pub channel_id: ChannelId,
+    pub message_notifications: usize,
+    pub muted: bool,
 }
 
 #[cfg(feature = "model")]

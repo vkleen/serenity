@@ -502,6 +502,8 @@ pub struct Ready {
     #[serde(rename = "v")]
     pub version: u64,
     pub user_settings: UserSettings,
+    #[serde(default, deserialize_with = "deserialize_user_guild_settings")]
+    pub user_guild_settings: HashMap<Option<GuildId>, UserGuildSettings>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
