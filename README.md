@@ -6,6 +6,8 @@
 
 Serenity is a Rust library for the Discord API.
 
+This is a fork of `serenity-rs/serenity` that has tweaks for making custom clients
+
 View the [examples] on how to make and structure a bot.
 
 Serenity supports bot login via the use of [`Client::new`].
