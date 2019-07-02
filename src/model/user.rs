@@ -937,6 +937,15 @@ pub struct UserGuildSettings {
     pub suppress_everyone: bool,
 }
 
+/// The last read message id and optional message count in a channel
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+pub struct ReadState {
+    pub mention_count: Option<usize>,
+    pub last_message_id: MessageId,
+    #[serde(rename = "id")]
+    pub channel_id: ChannelId,
+}
+
 /// Client overrides for a channel
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 pub struct UserChannelOverrides {

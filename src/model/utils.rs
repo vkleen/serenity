@@ -161,6 +161,19 @@ pub fn deserialize_user_channel_overrides<'de, D: Deserializer<'de>>(
     Ok(channel_overrides_map)
 }
 
+pub fn deserialize_read_state<'de, D: Deserializer<'de>>(
+    deserializer: D)
+    -> StdResult<HashMap<ChannelId, ReadState>, D::Error> {
+    let vec: Vec<ReadState> = Deserialize::deserialize(deserializer)?;
+    let mut read_state_map: HashMap<ChannelId, ReadState> = HashMap::new();
+
+    for read_state in vec {
+        read_state_map.insert(read_state.channel_id, read_state);
+    }
+
+    Ok(read_state_map)
+}
+
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<RoleId, Role>, D::Error> {

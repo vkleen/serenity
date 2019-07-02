@@ -504,6 +504,8 @@ pub struct Ready {
     pub user_settings: UserSettings,
     #[serde(default, deserialize_with = "deserialize_user_guild_settings")]
     pub user_guild_settings: HashMap<Option<GuildId>, UserGuildSettings>,
+    #[serde(default, deserialize_with = "deserialize_read_state")]
+    pub read_state: HashMap<ChannelId, ReadState>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
