@@ -64,6 +64,8 @@ pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 
+pub use tungstenite::Message;
+
 use std::{
     fmt::{
         Display,
