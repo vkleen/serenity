@@ -266,6 +266,10 @@ pub enum Route {
 }
 
 impl Route {
+    pub fn ack_message(channel_id: u64, message_id: u64) -> String {
+        format!(api!("/channels/{}/messages/{}/ack"), channel_id, message_id)
+    }
+
     pub fn channel(channel_id: u64) -> String {
         format!(api!("/channels/{}"), channel_id)
     }
@@ -621,6 +625,10 @@ impl Route {
 
 #[derive(Clone, Debug)]
 pub enum RouteInfo<'a> {
+    AckMessage {
+        channel_id: u64,
+        message_id: u64,
+    },
     AddGroupRecipient {
         group_id: u64,
         user_id: u64,
@@ -922,6 +930,11 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
+            RouteInfo::AckMessage { channel_id, message_id } => (
+                LightMethod::Post,
+                Route::ChannelsIdMessagesIdAck(channel_id),
+                Cow::from(Route::ack_message(channel_id, message_id)),
+            ),
             RouteInfo::AddGroupRecipient { group_id, user_id } => (
                 LightMethod::Put,
                 Route::None,

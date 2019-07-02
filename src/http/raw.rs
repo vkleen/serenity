@@ -83,6 +83,20 @@ impl Http {
         }
     }
 
+    /// Marks all messages up to a [`Message`] in a [`Channel`] as read
+    ///
+    /// **Note**: This is an undocumented endpoint
+    ///
+    /// [`Message`]: ../../model/channel/struct.Message.html
+    /// [`Channel`]: ../../model/channel/enum.Channel.html
+    pub fn ack_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
+        self.wind(200, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::AckMessage { channel_id, message_id },
+        })
+    }
+
     /// Adds a [`User`] as a recipient to a [`Group`].
     ///
     /// **Note**: Groups have a limit of 10 recipients, including the current user.

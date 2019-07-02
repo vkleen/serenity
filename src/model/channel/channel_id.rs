@@ -28,6 +28,15 @@ use serde_json::json;
 
 #[cfg(feature = "model")]
 impl ChannelId {
+    /// Reports all messages up to `message` as read to Discord in this channel.
+    ///
+    /// **Note**: This is an undocumented user api
+    #[cfg(feature = "http")]
+    pub fn ack_message<M>(&self, http: impl AsRef<Http>, message: M) -> Result<()>
+        where M: Into<MessageId> {
+        http.as_ref().ack_message(self.0, message.into().0)
+    }
+
     /// Broadcasts that the current user is typing to a channel for the next 5
     /// seconds.
     ///
