@@ -1238,6 +1238,7 @@ pub struct TypingStartEvent {
     pub channel_id: ChannelId,
     pub timestamp: u64,
     pub user_id: UserId,
+    pub guild_id: Option<GuildId>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
