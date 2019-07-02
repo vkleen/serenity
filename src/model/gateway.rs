@@ -501,6 +501,7 @@ pub struct Ready {
     pub user: CurrentUser,
     #[serde(rename = "v")]
     pub version: u64,
+    pub user_settings: UserSettings,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }

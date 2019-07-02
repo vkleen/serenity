@@ -910,6 +910,17 @@ impl<'a> From<&'a User> for UserId {
     fn from(user: &User) -> UserId { user.id }
 }
 
+/// Settings for the current user
+/// 
+/// # Note
+/// Only available for user accounts
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+pub struct UserSettings {
+    // Nany fields omitted
+    // #[serde(deserialize_with = "deserialize_guild_id")]
+    pub guild_positions: Vec<GuildId>
+}
+
 #[cfg(feature = "model")]
 fn avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| {
