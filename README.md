@@ -1,12 +1,17 @@
 [![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.37.0+ badge]][rust 1.37.0+ link]
 
-# serenity
+# serenity - client fork
 
 ![serenity logo][logo]
 
-Serenity is a Rust library for the Discord API.
+This is a fork of `serenity-rs/serenity` that has tweaks for making custom clients and
+probably violates Discord TOS.
 
-This is a fork of `serenity-rs/serenity` that has tweaks for making custom clients
+If you want to make a bot, use the upstream version.
+
+**This repo is not stable** and is often rebased onto upstream.
+
+Serenity is a Rust library for the Discord API.
 
 View the [examples] on how to make and structure a bot.
 
