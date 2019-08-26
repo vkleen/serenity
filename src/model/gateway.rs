@@ -203,6 +203,52 @@ impl Activity {
             _nonexhaustive: (),
         }
     }
+
+
+    /// Creates a `Activity` struct that appears as a `Watching <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current watching status:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
+    ///
+    /// # #[cfg(feature = "framework")]
+    /// #[command]
+    /// fn watch(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     let name = args.message();
+    ///     ctx.set_activity(Activity::watching(&name));
+    ///
+    ///     Ok(())
+    /// }
+    /// #
+    /// # fn main() {}
+    /// ```
+    pub fn watching(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Watching,
+            name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            timestamps: None,
+            url: None,
+            _nonexhaustive: (),
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Activity {
@@ -340,6 +386,8 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
+    /// An indicator that the user is watching something
+    Watching = 3,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -360,6 +408,7 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
+            Watching => 3,
             __Nonexhaustive => unreachable!(),
         }
     }
