@@ -570,6 +570,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 event_handler.guild_members_chunk(context, event.guild_id, event.members);
             });
         },
+        DispatchEvent::Model(Event::GuildMemberListUpdate(mut event)) => {
+            update(&cache_and_http, &mut event);
+        },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {
             update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);

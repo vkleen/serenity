@@ -830,6 +830,70 @@ impl Serialize for GuildUpdateEvent {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MemberListUpdateOp {
+    pub range: Vec<u32>,
+    pub op: String,
+    pub items: Vec<MemberListUpdateItem>,
+
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum MemberListUpdateItem {
+    Group {
+        id: String,
+        count: u32,
+    },
+    Member(MemberListUpdateMember)
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MemberListUpdateMember {
+    pub deaf: bool,
+    pub joined_at: Option<DateTime<FixedOffset>>,
+    pub mute: bool,
+    pub nick: Option<String>,
+    pub roles: Vec<RoleId>,
+    #[serde(deserialize_with = "deserialize_sync_user",
+        serialize_with = "serialize_sync_user")]
+    pub user: Arc<RwLock<User>>,
+}
+
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GuildMemberListUpdate {
+    pub ops: Vec<MemberListUpdateOp>,
+    pub online_count: u32,
+    pub member_count: u32,
+    pub guild_id: String,
+    // TODO: groups
+}
+
+#[cfg(feature = "cache")]
+impl CacheUpdate for GuildMemberListUpdate {
+    type Output = ();
+
+    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        for op in &self.ops {
+            if &op.op == "SYNC" {
+                for item in &op.items {
+                    match item {
+                        MemberListUpdateItem::Group{..} => {},
+                        MemberListUpdateItem::Member(member) => {
+                            let id = member.user.read().id;
+                            cache.users.insert(id, Arc::clone(&member.user));
+                            println!("sync: {:?}", id);
+                        }
+                    }
+                }
+            }
+        }
+
+        None
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct MessageCreateEvent {
     pub message: Message,
@@ -1507,6 +1571,7 @@ pub enum Event {
     /// A member's roles have changed
     GuildMemberUpdate(GuildMemberUpdateEvent),
     GuildMembersChunk(GuildMembersChunkEvent),
+    GuildMemberListUpdate(GuildMemberListUpdate),
     GuildRoleCreate(GuildRoleCreateEvent),
     GuildRoleDelete(GuildRoleDeleteEvent),
     GuildRoleUpdate(GuildRoleUpdateEvent),
@@ -1646,6 +1711,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::GuildMembersChunk => {
             Event::GuildMembersChunk(serde_json::from_value(v)?)
         },
+        EventType::GuildMemberListUpdate => {
+            Event::GuildMemberListUpdate(serde_json::from_value(v)?)
+        }
         EventType::GuildRoleCreate => {
             Event::GuildRoleCreate(serde_json::from_value(v)?)
         },
@@ -1807,6 +1875,12 @@ pub enum EventType {
     /// This maps to [`GuildRoleCreateEvent`].
     ///
     /// [`GuildRoleCreateEvent`]: struct.GuildRoleCreateEvent.html
+    /// Indicator that a guild member list update was received.
+    ///
+    /// This maps to [`GuildMemberListUpdate`].
+    ///
+    /// [`GuildMemberListUpdate`]: struct.GuildMemberListUpdate.html
+    GuildMemberListUpdate,
     GuildRoleCreate,
     /// Indicator that a guild role delete payload was received.
     ///
@@ -1968,6 +2042,7 @@ impl<'de> Deserialize<'de> for EventType {
                     "GUILD_MEMBER_REMOVE" => EventType::GuildMemberRemove,
                     "GUILD_MEMBER_UPDATE" => EventType::GuildMemberUpdate,
                     "GUILD_MEMBERS_CHUNK" => EventType::GuildMembersChunk,
+                    "GUILD_MEMBER_LIST_UPDATE" => EventType::GuildMemberListUpdate,
                     "GUILD_ROLE_CREATE" => EventType::GuildRoleCreate,
                     "GUILD_ROLE_DELETE" => EventType::GuildRoleDelete,
                     "GUILD_ROLE_UPDATE" => EventType::GuildRoleUpdate,
