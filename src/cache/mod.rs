@@ -195,6 +195,8 @@ pub struct Cache {
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub users: HashMap<UserId, Arc<RwLock<User>>>,
+    /// The state of the users unread messages
+    pub read_state: HashMap<ChannelId, ReadState>,
     /// Queue of message IDs for each channel.
     ///
     /// This is simply a vecdeque so we can keep track of the order of messages
@@ -853,6 +855,7 @@ impl Default for Cache {
             unavailable_guilds: HashSet::default(),
             user: CurrentUser::default(),
             users: HashMap::default(),
+            read_state: HashMap::default(),
             message_queue: HashMap::default(),
             __nonexhaustive: (),
         }

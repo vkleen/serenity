@@ -632,6 +632,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 }}
             });
         },
+        DispatchEvent::Model(Event::MessageAck(mut event)) => {
+            update(&cache_and_http, &mut event);
+        },
         // Already handled by the framework check macro
         DispatchEvent::Model(Event::MessageCreate(_)) => {},
         DispatchEvent::Model(Event::MessageDeleteBulk(event)) => {
