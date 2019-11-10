@@ -14,8 +14,11 @@ edition = "2018"
 [dependencies]
 bitflags = "1"
 log = "0.4"
-parking_lot = "0.9"
 serde_json = "1"
+
+[dependencies.parking_lot]
+rev = "046a171"
+git = "https://github.com/terminal-discord/parking_lot"
 
 [dependencies.audiopus]
 optional = true
