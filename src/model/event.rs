@@ -933,6 +933,10 @@ impl CacheUpdate for MessageCreateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+        if let Some(mut read_state) = cache.read_state.get_mut(&self.message.channel_id) {
+            read_state.last_message_id = self.message.id;
+        }
+
         let max = cache.settings().max_messages;
 
         if max == 0 {
