@@ -898,6 +898,7 @@ impl CacheUpdate for GuildMemberListUpdate {
 pub struct MessageAckEvent {
     pub channel_id: ChannelId,
     pub message_id: MessageId,
+    #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
 
