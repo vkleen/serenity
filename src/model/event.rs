@@ -883,7 +883,7 @@ impl CacheUpdate for GuildMemberListUpdate {
                         MemberListUpdateItem::Member(member) => {
                             let id = member.user.read().id;
                             cache.users.insert(id, Arc::clone(&member.user));
-                            println!("sync: {:?}", id);
+                            // println!("sync: {:?}", id);
                         }
                     }
                 }
@@ -1495,6 +1495,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     .ok_or_else(|| DeError::custom("expected gateway event sequence"))
                     .and_then(u64::deserialize)
                     .map_err(DeError::custom)?;
+                // eprintln!("{:#?}", map.get("t"));
                 let kind = map.remove("t")
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(EventType::deserialize)
