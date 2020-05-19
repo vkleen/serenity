@@ -563,6 +563,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMembersChunk(mut event)) => {
+            // eprintln!("GUILD_MEMBERS_CHUNK_EVENT:{:?}", event);
             update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
@@ -571,6 +572,8 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMemberListUpdate(mut event)) => {
+            // eprintln!("GUILD_MEMBER_LIST_UPDATE: {:?}", event);
+
             update(&cache_and_http, &mut event);
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {

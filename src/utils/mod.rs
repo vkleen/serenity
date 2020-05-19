@@ -716,10 +716,10 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                                 format!("@{}", member.display_name())
                             }
                         } else {
-                            "@invalid-user".to_string()
+                            format!("@invalid-user{{{}|{}}}", id.0, guild.read().id.0)
                         }
                     } else {
-                        "@invalid-user".to_string()
+                        format!("@invalid-user{{{}|{}}}", id.0, guild.0)
                     }
                 } else {
                     let user = cache.read().users.get(&id).cloned();
@@ -733,7 +733,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                             format!("@{}", user.name)
                         }
                     } else {
-                        "@invalid-user".to_string()
+                        format!("@invalid-user{{{}|{}}}", id.0, guild.unwrap_or(GuildId(0)))
                     }
                 };
 
