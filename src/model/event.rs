@@ -866,7 +866,7 @@ pub struct GuildMemberListUpdate {
     pub ops: Vec<MemberListUpdateOp>,
     pub online_count: u32,
     pub member_count: u32,
-    pub guild_id: String,
+    pub guild_id: GuildId,
     // TODO: groups
 }
 
@@ -881,9 +881,35 @@ impl CacheUpdate for GuildMemberListUpdate {
                     match item {
                         MemberListUpdateItem::Group { .. } => {}
                         MemberListUpdateItem::Member(member) => {
-                            let id = member.user.read().id;
-                            cache.users.insert(id, Arc::clone(&member.user));
-                            // println!("sync: {:?}", id);
+                            let user = member.user.read();
+                            cache.update_user_entry(&user);
+
+                            if let Some(guild) = cache.guilds.get(&self.guild_id) {
+                                let mut guild = guild.write();
+
+                                if let Some(guild_member) = guild.members.get_mut(&user.id) {
+                                    guild_member.deaf.clone_from(&member.deaf);
+                                    guild_member.joined_at.clone_from(&member.joined_at);
+                                    guild_member.mute.clone_from(&member.mute);
+                                    guild_member.nick.clone_from(&member.nick);
+                                    guild_member.roles.clone_from(&member.roles);
+                                    guild_member.user.write().clone_from(&user);
+                                } else {
+                                    guild.members.insert(
+                                        user.id,
+                                        Member {
+                                            deaf: member.deaf,
+                                            guild_id: self.guild_id,
+                                            joined_at: member.joined_at,
+                                            mute: member.mute,
+                                            nick: member.nick.clone(),
+                                            roles: member.roles.clone(),
+                                            user: Arc::new(RwLock::new(user.clone())),
+                                            _nonexhaustive: (),
+                                        },
+                                    );
+                                }
+                            }
                         }
                     }
                 }
