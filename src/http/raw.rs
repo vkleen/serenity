@@ -91,7 +91,7 @@ impl Http {
     /// [`Channel`]: ../../model/channel/enum.Channel.html
     pub fn ack_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
         self.wind(200, Request {
-            body: None,
+            body: Some("{\"token\":null}".as_bytes()),
             headers: None,
             route: RouteInfo::AckMessage { channel_id, message_id },
         })
