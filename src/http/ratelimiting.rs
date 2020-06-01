@@ -85,10 +85,7 @@ pub struct Ratelimiter {
 
 impl Ratelimiter {
     /// Creates a new ratelimiter, with a shared `reqwest` client and the
-    /// bot's token.
-    ///
-    /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
-    /// prefix it.
+    /// token.
     pub fn new(client: Arc<Client>, token: impl Into<String>) -> Self {
         Self::_new(client, token.into())
     }

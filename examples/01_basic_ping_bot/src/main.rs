@@ -41,9 +41,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    // Create a new instance of the Client, logging in as a bot. This will
-    // automatically prepend your bot token with "Bot ", which is a requirement
-    // by Discord for bot users.
+    // Create a new instance of the Client, logging in.
     let mut client = Client::new(&token)
         .event_handler(Handler)
         .await
