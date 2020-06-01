@@ -463,6 +463,7 @@ impl ChannelId {
         };
 
         Some(match channel {
+            Channel::Group(channel) => channel.name().to_string(),
             Channel::Guild(channel) => channel.name().to_string(),
             Channel::Category(category) => category.name().to_string(),
             Channel::Private(channel) => channel.name(),

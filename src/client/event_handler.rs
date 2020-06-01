@@ -43,6 +43,11 @@ pub trait EventHandler: Send + Sync {
     /// Provides said channel's data.
     async fn private_channel_create(&self, _ctx: Context, _channel: &PrivateChannel) {}
 
+    /// Dispatched when a group channel is created.
+    ///
+    /// Provides said channel's data.
+    async fn group_channel_create(&self, _ctx: Context, _channel: &GroupChannel) {}
+
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.

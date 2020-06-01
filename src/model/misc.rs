@@ -29,6 +29,7 @@ impl Mentionable for ChannelId {
 impl Mentionable for Channel {
     fn mention(&self) -> String {
         match *self {
+            Channel::Group(ref channel) => channel.mention(),
             Channel::Guild(ref channel) => channel.mention(),
             Channel::Private(ref channel) => channel.mention(),
             Channel::Category(ref channel) => channel.mention(),
@@ -82,6 +83,12 @@ impl Mentionable for UserId {
 
 impl Mentionable for User {
     fn mention(&self) -> String { format!("<@{}>", self.id.0) }
+}
+
+impl Mentionable for GroupChannel {
+    fn mention(&self) -> String {
+        format!("<#{}>", self.id.0)
+    }
 }
 
 impl Mentionable for GuildChannel {

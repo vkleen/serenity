@@ -8,6 +8,7 @@ mod message;
 mod private_channel;
 mod reaction;
 mod channel_category;
+mod group_channel;
 
 pub use self::attachment::*;
 pub use self::channel_id::*;
@@ -17,6 +18,7 @@ pub use self::message::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
+pub use self::group_channel::*;
 
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
@@ -43,6 +45,8 @@ use crate::http::CacheHttp;
 /// A container for any channel.
 #[derive(Clone, Debug)]
 pub enum Channel {
+    /// A group. A group comprises of only one channel.
+    Group(GroupChannel),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
@@ -179,6 +183,9 @@ impl Channel {
     /// owning the required permissions the HTTP-request will be issued.
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
+            Channel::Group(ref group_channel) => {
+                let _ = group_channel.delete(cache_http.http()).await?;
+            },
             Channel::Guild(ref public_channel) => {
                 let _ = public_channel.delete(cache_http).await?;
             },
@@ -198,6 +205,7 @@ impl Channel {
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
+            Channel::Group(_) => false,
             Channel::Guild(ref channel) => channel.is_nsfw(),
             Channel::Category(ref category) => category.is_nsfw(),
             Channel::Private(_) => false,
@@ -213,6 +221,7 @@ impl Channel {
     #[inline]
     pub fn id(&self) -> ChannelId {
         match *self {
+            Channel::Group(ref ch) => ch.id,
             Channel::Guild(ref ch) => ch.id,
             Channel::Private(ref ch) => ch.id,
             Channel::Category(ref ch) => ch.id,
@@ -253,6 +262,9 @@ impl<'de> Deserialize<'de> for Channel {
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
                 .map(|x| Channel::Private(x))
                 .map_err(DeError::custom),
+            3 => serde_json::from_value::<GroupChannel>(Value::Object(v))
+                .map(|x| Channel::Group(x))
+                .map_err(DeError::custom),
             4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
                 .map(|x| Channel::Category(x))
                 .map_err(DeError::custom),
@@ -265,6 +277,9 @@ impl Serialize for Channel {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
         match *self {
+            Channel::Group(ref c) => {
+                GroupChannel::serialize(&c, serializer)
+            },
             Channel::Category(ref c) => {
                 ChannelCategory::serialize(&c, serializer)
             },
@@ -292,6 +307,8 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
+            Channel::Group(ref group) =>
+                Display::fmt(&group.id.mention(), f),
             Channel::Guild(ref channel) =>
                 Display::fmt(&channel.id.mention(), f),
             Channel::Private(ref channel) => {
@@ -319,6 +336,10 @@ pub enum ChannelType {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Voice = 2,
+    /// An indicator that the channel is the channel of a [`Group`].
+    ///
+    /// [`Group`]: struct.Group.html
+    Group = 3,
     /// An indicator that the channel is the channel of a [`ChannelCategory`].
     ///
     /// [`ChannelCategory`]: struct.ChannelCategory.html
@@ -357,6 +378,7 @@ impl ChannelType {
             ChannelType::Private => "private",
             ChannelType::Text => "text",
             ChannelType::Voice => "voice",
+            ChannelType::Group => "group",
             ChannelType::Category => "category",
             ChannelType::News => "news",
             ChannelType::Store => "store",
@@ -370,6 +392,7 @@ impl ChannelType {
             ChannelType::Text => 0,
             ChannelType::Private => 1,
             ChannelType::Voice => 2,
+            ChannelType::Group => 3,
             ChannelType::Category => 4,
             ChannelType::News => 5,
             ChannelType::Store => 6,

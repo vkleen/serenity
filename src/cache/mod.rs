@@ -108,6 +108,8 @@ pub struct Cache {
     pub(crate) channels: RwLock<HashMap<ChannelId, GuildChannel>>,
     /// A map of channel categories.
     pub(crate) categories: RwLock<HashMap<ChannelId, ChannelCategory>>,
+    /// A map of the groups that the current user is in.
+    pub(crate) group_channels: RwLock<HashMap<ChannelId, GroupChannel>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
@@ -955,6 +957,7 @@ impl Default for Cache {
         Cache {
             channels: RwLock::new(HashMap::default()),
             categories: RwLock::new(HashMap::default()),
+            group_channels: RwLock::new(HashMap::default()),
             guilds: RwLock::new(HashMap::default()),
             messages: RwLock::new(HashMap::default()),
             presences: RwLock::new(HashMap::default()),

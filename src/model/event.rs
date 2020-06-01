@@ -61,6 +61,29 @@ impl CacheUpdate for ChannelCreateEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         match self.channel {
+            Channel::Group(ref mut group) => {
+                for recipient in group.recipients.iter_mut() {
+                    let user_id = {
+                        cache.update_user_entry(recipient).await;
+
+                        recipient.id
+                    };
+
+                    cache
+                        .users
+                        .read()
+                        .await
+                        .get(&user_id)
+                        .map(|u| *recipient = u.clone());
+                }
+
+                cache
+                    .group_channels
+                    .write()
+                    .await
+                    .insert(group.id, group.clone())
+                    .map(Channel::Group)
+            },
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
@@ -133,6 +156,11 @@ impl CacheUpdate for ChannelDeleteEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         match self.channel {
+            Channel::Group(ref channel) => {
+                let id = channel.id;
+
+                cache.group_channels.write().await.remove(&id);
+            },
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
@@ -231,6 +259,14 @@ impl CacheUpdate for ChannelUpdateEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         match self.channel {
+            Channel::Group(ref channel) => {
+                cache
+                    .group_channels
+                    .write()
+                    .await
+                    .get_mut(&channel.id)
+                    .map(|c|c.clone_from(channel));
+            },
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
