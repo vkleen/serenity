@@ -5,9 +5,6 @@
 # Target directory
 target/
 
-# Lockfile
-Cargo.lock
-
 # Misc
 rls/
 *.iml
